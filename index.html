@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tuntun Hadi Toro | The Abstract Log</title>
+    <title>Tuntun Hadi Toro | System Architect</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=JetBrains+Mono:wght@100;400&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -16,13 +16,21 @@
                         display: ['"Syncopate"', 'sans-serif'],
                     },
                     colors: {
-                        'void': '#030303',
-                        'paper': '#eaeaea',
+                        'void': '#050505',
+                        'off-white': '#e1e1e1',
                         'acid': '#ccff00',
+                        'alert': '#ff3333',
                     },
                     animation: {
-                        'float': 'float 10s ease-in-out infinite',
-                        'spin-slow': 'spin 20s linear infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'pulse-fast': 'pulse 0.1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scroll': 'scroll 20s linear infinite',
+                    },
+                    keyframes: {
+                        scroll: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
                     }
                 }
             }
@@ -30,291 +38,413 @@
     </script>
     <style>
         body {
-            background-color: #030303;
-            color: #eaeaea;
+            background-color: #050505;
+            color: #e1e1e1;
             overflow-x: hidden;
+            cursor: crosshair;
         }
 
-        /* Grain Texture Overlay */
+        /* Scanline & Noise */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            z-index: 40;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+        
         .noise-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
-            z-index: 50;
-            opacity: 0.07;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: 39;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* Abstract Blobs */
-        .blob {
-            position: absolute;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.6;
-            animation: float 10s ease-in-out infinite;
-        }
-        .blob-1 { background: purple; width: 400px; height: 400px; top: -100px; left: -100px; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-        .blob-2 { background: #ccff00; width: 300px; height: 300px; bottom: 10%; right: -50px; border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; animation-delay: -5s; mix-blend-mode: difference; }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(30px, -50px) rotate(10deg); }
-            66% { transform: translate(-20px, 20px) rotate(-5deg); }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #030303; }
-        ::-webkit-scrollbar-thumb { background: #333; }
-
-        /* Typography Utilities */
-        .outlined-text {
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
-            color: transparent;
-            transition: all 0.5s ease;
-        }
-        .outlined-text:hover {
-            -webkit-text-stroke: 0px;
+        /* Typography Effects */
+        .glitch-hover:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
             color: #ccff00;
         }
-
-        /* Nav Blur */
-        .smoky-nav {
-            background: rgba(3, 3, 3, 0.6);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
         }
 
-        .reveal-text { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .reveal-text.active { opacity: 1; transform: translateY(0); }
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Nav Glass */
+        .glass-nav {
+            background: rgba(5, 5, 5, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Selection */
+        ::selection {
+            background: #ccff00;
+            color: #000;
+        }
     </style>
 </head>
 <body>
-    
-    <!-- Texture & Background -->
+
+    <!-- Overlays -->
+    <div class="scanlines"></div>
     <div class="noise-overlay"></div>
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-[100] smoky-nav py-6">
+    <nav class="fixed w-full z-50 glass-nav py-5">
         <div class="container mx-auto px-6 flex justify-between items-center">
-            <a href="#" class="font-display font-bold text-xl tracking-widest mix-blend-difference z-50">THT.</a>
-            
-            <button id="menu-btn" class="md:hidden group flex flex-col gap-1.5 items-end z-50">
-                <span class="w-8 h-[1px] bg-white group-hover:w-6 transition-all"></span>
-                <span class="w-5 h-[1px] bg-white group-hover:w-8 transition-all"></span>
-            </button>
-
-            <div class="hidden md:flex gap-12 font-mono text-xs tracking-widest text-gray-400">
-                <a href="#manifesto" class="hover:text-acid transition-colors">[ MANIFESTO ]</a>
-                <a href="#log" class="hover:text-acid transition-colors">[ /VAR/LOG ]</a>
-                <a href="#vision" class="hover:text-acid transition-colors">[ VISION ]</a>
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-acid animate-pulse"></div>
+                <a href="#" class="font-mono font-bold tracking-widest text-sm mix-blend-difference">SYS.TUNTUN_V2</a>
             </div>
+            
+            <div class="hidden md:flex gap-8 font-mono text-[10px] tracking-[0.2em] text-gray-400">
+                <a href="#about" class="hover:text-acid transition-colors">[ 01_INIT ]</a>
+                <a href="#stack" class="hover:text-acid transition-colors">[ 02_STACK ]</a>
+                <a href="#projects" class="hover:text-acid transition-colors">[ 03_WORKS ]</a>
+                <a href="#log" class="hover:text-acid transition-colors">[ 04_LOG ]</a>
+                <a href="#signal" class="hover:text-acid transition-colors">[ 05_SIGNAL ]</a>
+            </div>
+
+            <button id="menu-btn" class="md:hidden text-acid font-mono text-xl">[+]</button>
         </div>
     </nav>
 
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="fixed inset-0 bg-[#030303] z-[90] transform translate-y-[-100%] transition-transform duration-700 flex items-center justify-center">
-        <div class="flex flex-col gap-8 text-center font-display text-3xl">
-            <a href="#manifesto" class="mobile-link hover:text-acid hover:italic transition-all">MANIFESTO</a>
-            <a href="#log" class="mobile-link hover:text-acid hover:italic transition-all">SYSTEM LOG</a>
-            <a href="#vision" class="mobile-link hover:text-acid hover:italic transition-all">VISION</a>
-            <button id="close-menu" class="mt-8 font-mono text-xs text-gray-500">[ CLOSE TERMINAL ]</button>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 bg-void z-40 transform translate-x-full transition-transform duration-500 flex items-center justify-center border-l border-white/10">
+        <div class="flex flex-col gap-8 text-center font-display text-2xl">
+            <a href="#about" class="mobile-link text-white hover:text-acid hover:italic">INITIATE</a>
+            <a href="#stack" class="mobile-link text-white hover:text-acid hover:italic">STACK</a>
+            <a href="#projects" class="mobile-link text-white hover:text-acid hover:italic">WORKS</a>
+            <a href="#log" class="mobile-link text-white hover:text-acid hover:italic">LOGS</a>
+            <button id="close-menu" class="mt-8 font-mono text-xs text-alert">[ TERMINATE ]</button>
         </div>
     </div>
 
     <!-- Hero Section -->
-    <section class="min-h-screen flex flex-col justify-center px-6 relative pt-20">
-        <div class="container mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                <div class="lg:col-span-8 reveal-text">
-                    <h1 class="font-display text-[12vw] leading-[0.85] font-bold mix-blend-difference">
-                        TUNTUN<br>
-                        <span class="outlined-text">HADI</span><br>
-                        TORO
-                    </h1>
-                </div>
-                <div class="lg:col-span-4 flex flex-col justify-end pb-4 reveal-text" style="transition-delay: 0.2s">
-                    <p class="font-mono text-sm text-acid mb-4">> sudo whoami</p>
-                    <p class="font-serif text-2xl md:text-3xl italic leading-relaxed text-gray-300">
-                        "Menemukan puisi di dalam Kernel Panic, dan struktur geometri di lensa kamera."
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Scrolling Marquee -->
-        <div class="absolute bottom-10 left-0 w-full overflow-hidden whitespace-nowrap opacity-30 font-mono text-[10px]">
-            <div class="inline-block animate-[float_20s_linear_infinite]">
-                LINUX ARCHITECT /// PHOTOGRAPHY /// BIBLIOPHILE /// OPEN SOURCE /// VISUAL ART /// LINUX ARCHITECT /// PHOTOGRAPHY ///
-            </div>
-        </div>
-    </section>
-
-    <!-- The Manifesto (About) -->
-    <section id="manifesto" class="py-32 px-6 relative border-t border-white/10">
-        <div class="container mx-auto max-w-5xl">
-            <div class="flex flex-col md:flex-row gap-12 md:items-start">
-                <div class="w-full md:w-1/3 reveal-text">
-                    <span class="block w-3 h-3 bg-acid mb-4"></span>
-                    <h2 class="font-mono text-xs tracking-[0.3em] text-gray-500 uppercase">Profile Configuration</h2>
-                </div>
-                <div class="w-full md:w-2/3 reveal-text">
-                    <p class="font-serif text-3xl md:text-5xl leading-tight mb-12">
-                        Saya hidup di antara dua dunia: <span class="text-acid italic">abstrak</span> dan <span class="text-acid italic">absolut</span>.
-                    </p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 font-mono text-sm text-gray-400">
-                        <div class="border-l border-white/20 pl-6 hover:border-acid transition-colors duration-500">
-                            <h3 class="text-white font-bold mb-2">// 01. LINUX</h3>
-                            <p>Bukan sekadar OS, tapi filosofi. Saya menyukai kontrol mutlak. Tiling Window Managers, Bash scripting, dan keindahan efisiensi sistem.</p>
-                        </div>
-                        <div class="border-l border-white/20 pl-6 hover:border-acid transition-colors duration-500">
-                            <h3 class="text-white font-bold mb-2">// 02. LITERASI</h3>
-                            <p>Data input untuk otak. Buku memberi perspektif yang tidak bisa diberikan oleh algoritma manapun.</p>
-                        </div>
-                        <div class="border-l border-white/20 pl-6 hover:border-acid transition-colors duration-500">
-                            <h3 class="text-white font-bold mb-2">// 03. VISUAL</h3>
-                            <p>Fotografi adalah cara saya menekan tombol 'pause' pada waktu. Mencari komposisi di tengah chaos.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- The Log (Articles) -->
-    <section id="log" class="py-32 px-6 bg-[#050505]">
-        <div class="container mx-auto">
-            <h2 class="font-display text-4xl md:text-6xl mb-20 text-center mix-blend-difference">/VAR/LOG/LINUX</h2>
+    <section class="min-h-screen flex items-center px-6 relative pt-20 border-b border-white/5">
+        <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
-            <div class="flex flex-col border-t border-white/10">
-                <!-- Article Item 1 -->
-                <a href="#" class="group relative py-12 border-b border-white/10 overflow-hidden reveal-text">
-                    <div class="absolute inset-0 bg-acid transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom"></div>
-                    <div class="flex flex-col md:flex-row justify-between items-baseline relative z-10 px-4">
-                        <span class="font-mono text-xs text-gray-500 group-hover:text-gray-800 transition-colors duration-300">ID: 001_ARCH_RICE</span>
-                        <h3 class="font-serif text-3xl md:text-4xl italic group-hover:tracking-wider group-hover:text-gray-900 transition-all duration-500">Minimalism in Arch Linux</h3>
-                        <span class="font-mono text-xs group-hover:text-gray-800 transition-colors hidden md:block">[ READ ]</span>
-                    </div>
-                </a>
+            <!-- Left: Typography -->
+            <div class="z-10 reveal">
+                <p class="font-mono text-acid text-xs mb-4 animate-pulse">/// SYSTEM_READY</p>
+                <h1 class="font-display text-[15vw] lg:text-[10vw] leading-[0.8] font-bold text-white mix-blend-exclusion">
+                    TUNTUN<br>
+                    <span class="text-stroke text-transparent" style="-webkit-text-stroke: 1px #fff;">HADI</span><br>
+                    TORO
+                </h1>
+                <div class="mt-8 max-w-md border-l-2 border-acid pl-6">
+                    <p class="font-serif text-2xl text-gray-400 italic">
+                        "Architecting robustness in a fragile digital world."
+                    </p>
+                </div>
+            </div>
 
-                <!-- Article Item 2 -->
-                <a href="#" class="group relative py-12 border-b border-white/10 overflow-hidden reveal-text">
-                    <div class="absolute inset-0 bg-acid transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom"></div>
-                    <div class="flex flex-col md:flex-row justify-between items-baseline relative z-10 px-4">
-                        <span class="font-mono text-xs text-gray-500 group-hover:text-gray-800 transition-colors duration-300">ID: 002_VIM_WORKFLOW</span>
-                        <h3 class="font-serif text-3xl md:text-4xl italic group-hover:tracking-wider group-hover:text-gray-900 transition-all duration-500">Why I Never Leave the Terminal</h3>
-                        <span class="font-mono text-xs group-hover:text-gray-800 transition-colors hidden md:block">[ READ ]</span>
+            <!-- Right: Interactive Terminal Dashboard -->
+            <div class="relative w-full h-[400px] lg:h-[500px] bg-[#0a0a0a] border border-white/10 rounded-sm p-4 font-mono text-xs overflow-hidden reveal shadow-2xl shadow-acid/5" style="transition-delay: 0.2s">
+                <!-- Terminal Header -->
+                <div class="flex justify-between border-b border-white/10 pb-2 mb-2">
+                    <span class="text-gray-500">root@tuntun-server:~</span>
+                    <div class="flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-gray-600"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-600"></div>
                     </div>
-                </a>
-
-                <!-- Article Item 3 -->
-                <a href="#" class="group relative py-12 border-b border-white/10 overflow-hidden reveal-text">
-                    <div class="absolute inset-0 bg-acid transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom"></div>
-                    <div class="flex flex-col md:flex-row justify-between items-baseline relative z-10 px-4">
-                        <span class="font-mono text-xs text-gray-500 group-hover:text-gray-800 transition-colors duration-300">ID: 003_DIGITAL_ROT</span>
-                        <h3 class="font-serif text-3xl md:text-4xl italic group-hover:tracking-wider group-hover:text-gray-900 transition-all duration-500">The Art of Breaking Systems</h3>
-                        <span class="font-mono text-xs group-hover:text-gray-800 transition-colors hidden md:block">[ READ ]</span>
-                    </div>
-                </a>
+                </div>
+                <!-- Terminal Content (Animated via JS) -->
+                <div id="terminal-content" class="text-green-500 space-y-1 h-full overflow-hidden opacity-80">
+                    <!-- JS inserts text here -->
+                </div>
+                <!-- Scanline effect for terminal -->
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none"></div>
             </div>
         </div>
     </section>
 
-    <!-- Visual Gallery (Abstract Placeholders) -->
-    <section id="vision" class="py-32 px-6">
+    <!-- Marquee Tech Stack -->
+    <section id="stack" class="py-12 border-b border-white/10 bg-[#080808] overflow-hidden">
+        <div class="flex whitespace-nowrap overflow-hidden">
+            <div class="animate-scroll flex gap-8 font-display text-4xl md:text-6xl text-white/10 font-bold items-center select-none">
+                <span>LINUX ARCH</span> <span class="text-acid">///</span>
+                <span>BASH SCRIPTING</span> <span class="text-acid">///</span>
+                <span>DOCKER</span> <span class="text-acid">///</span>
+                <span>NEOVIM</span> <span class="text-acid">///</span>
+                <span>PYTHON</span> <span class="text-acid">///</span>
+                <span>NGINX</span> <span class="text-acid">///</span>
+                <span>ANSIBLE</span> <span class="text-acid">///</span>
+                <span>GIT</span> <span class="text-acid">///</span>
+                <!-- Duplicate for seamless loop -->
+                <span>LINUX ARCH</span> <span class="text-acid">///</span>
+                <span>BASH SCRIPTING</span> <span class="text-acid">///</span>
+                <span>DOCKER</span> <span class="text-acid">///</span>
+                <span>NEOVIM</span> <span class="text-acid">///</span>
+                <span>PYTHON</span> <span class="text-acid">///</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- About / Manifesto -->
+    <section id="about" class="py-32 px-6">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="reveal">
+                <h2 class="font-mono text-xs text-acid tracking-widest mb-4">/// WHOAMI</h2>
+                <div class="w-full aspect-square bg-white/5 border border-white/10 relative overflow-hidden group">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover grayscale mix-blend-luminosity group-hover:scale-110 transition duration-700" alt="Abstract Tech">
+                    <div class="absolute inset-0 bg-acid/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                </div>
+            </div>
+            <div class="md:col-span-2 flex flex-col justify-center reveal" style="transition-delay: 0.1s">
+                <p class="font-serif text-3xl md:text-5xl leading-tight mb-8">
+                    Menghindari "Bloatware" dalam kode dan kehidupan. Saya membangun sistem yang <span class="text-acid italic">resilient</span>, efisien, dan memiliki estetika fungsional.
+                </p>
+                <div class="grid grid-cols-2 gap-8 font-mono text-xs text-gray-500">
+                    <div>
+                        <strong class="text-white block mb-1">FOCUS</strong>
+                        System Hardening, Automation, Digital Minimalism.
+                    </div>
+                    <div>
+                        <strong class="text-white block mb-1">LOCATION</strong>
+                        Jakarta, Indonesia (Remote Ready).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Selected Works (Projects) -->
+    <section id="projects" class="py-32 px-6 border-t border-white/10">
         <div class="container mx-auto">
-            <div class="flex justify-between items-end mb-16 reveal-text">
-                <h2 class="font-mono text-xs tracking-widest text-acid">/// VISUAL_OUTPUT</h2>
-                <p class="font-serif text-xl italic text-gray-500">"No signal, just noise."</p>
+            <div class="flex justify-between items-end mb-16 reveal">
+                <h2 class="font-display text-4xl">SELECTED WORKS</h2>
+                <span class="font-mono text-xs text-acid">[ INDEX_03 ]</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-                <!-- Abstract Frame 1 -->
-                <div class="aspect-[3/4] bg-[#0a0a0a] border border-white/5 relative group overflow-hidden reveal-text">
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-32 h-32 border border-white/20 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-                        <div class="absolute w-full h-[1px] bg-white/20 rotate-45 group-hover:rotate-90 transition-transform duration-700"></div>
-                    </div>
-                    <div class="absolute bottom-4 left-4 font-mono text-[10px] text-gray-500">IMG_001.RAW</div>
-                </div>
-
-                <!-- Abstract Frame 2 -->
-                <div class="aspect-[3/4] bg-[#080808] border border-white/5 relative group overflow-hidden reveal-text" style="transition-delay: 0.1s">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                    <div class="absolute inset-4 border border-dashed border-white/10 flex items-center justify-center">
-                        <span class="font-display text-4xl font-bold opacity-10 group-hover:opacity-100 transition-opacity">VOID</span>
+            <div class="space-y-4">
+                <!-- Project 1 -->
+                <div class="group border border-white/10 p-8 hover:bg-white/5 transition-all duration-500 reveal cursor-pointer relative overflow-hidden">
+                    <div class="absolute right-0 top-0 h-full w-1 bg-acid transform scale-y-0 group-hover:scale-y-100 transition-transform duration-300"></div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h3 class="font-display text-2xl md:text-3xl mb-2 group-hover:text-acid transition-colors">HOMELAB AUTOMATION</h3>
+                            <p class="font-serif text-gray-400 italic">Ansible playbooks for self-hosted services.</p>
+                        </div>
+                        <div class="flex gap-2 font-mono text-[10px] uppercase">
+                            <span class="px-2 py-1 border border-white/20 rounded-full">YAML</span>
+                            <span class="px-2 py-1 border border-white/20 rounded-full">DOCKER</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Abstract Frame 3 -->
-                <div class="aspect-[3/4] bg-[#0a0a0a] border border-white/5 relative group overflow-hidden reveal-text" style="transition-delay: 0.2s">
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-20 bg-acid/50 blur-lg group-hover:h-full transition-all duration-500"></div>
-                    <div class="absolute bottom-4 left-4 font-mono text-[10px] text-gray-500">IMG_003.ISO</div>
+                <!-- Project 2 -->
+                <div class="group border border-white/10 p-8 hover:bg-white/5 transition-all duration-500 reveal cursor-pointer relative overflow-hidden">
+                    <div class="absolute right-0 top-0 h-full w-1 bg-acid transform scale-y-0 group-hover:scale-y-100 transition-transform duration-300"></div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h3 class="font-display text-2xl md:text-3xl mb-2 group-hover:text-acid transition-colors">ARCH DOTFILES</h3>
+                            <p class="font-serif text-gray-400 italic">Highly optimized Hyprland configuration.</p>
+                        </div>
+                        <div class="flex gap-2 font-mono text-[10px] uppercase">
+                            <span class="px-2 py-1 border border-white/20 rounded-full">LUA</span>
+                            <span class="px-2 py-1 border border-white/20 rounded-full">SHELL</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Articles (Log) -->
+    <section id="log" class="py-32 px-6 bg-[#080808]">
+        <div class="container mx-auto">
+            <h2 class="font-mono text-xs text-acid tracking-widest mb-12 reveal">/// SYSTEM_LOGS (ARTICLES)</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20">
+                <!-- Article 1 -->
+                <article class="reveal group cursor-pointer">
+                    <div class="border-b border-white/20 pb-4 mb-4 group-hover:border-acid transition-colors duration-500">
+                        <span class="font-mono text-[10px] text-gray-500 block mb-2">DATE: 2024-02-14 | TAG: SECURITY</span>
+                        <h3 class="font-display text-2xl leading-snug glitch-hover">Hardening Linux Servers: A Practical Guide to SSH & Firewalld</h3>
+                    </div>
+                    <p class="font-serif text-gray-400 text-lg leading-relaxed group-hover:text-white transition-colors">
+                        Mengapa password saja tidak cukup? Pembahasan mendalam tentang penggunaan SSH Keys, menonaktifkan Root login, dan konfigurasi Fail2Ban untuk mencegah Brute Force.
+                    </p>
+                </article>
+
+                <!-- Article 2 -->
+                <article class="reveal group cursor-pointer" style="transition-delay: 0.1s">
+                    <div class="border-b border-white/20 pb-4 mb-4 group-hover:border-acid transition-colors duration-500">
+                        <span class="font-mono text-[10px] text-gray-500 block mb-2">DATE: 2024-01-20 | TAG: AUTOMATION</span>
+                        <h3 class="font-display text-2xl leading-snug glitch-hover">Goodbye Cron, Hello Systemd Timers</h3>
+                    </div>
+                    <p class="font-serif text-gray-400 text-lg leading-relaxed group-hover:text-white transition-colors">
+                        Cronjob itu klasik, tapi Systemd Timers menawarkan logging yang lebih baik, dependency management, dan akurasi eksekusi yang superior untuk task server.
+                    </p>
+                </article>
+
+                <!-- Article 3 -->
+                <article class="reveal group cursor-pointer" style="transition-delay: 0.2s">
+                    <div class="border-b border-white/20 pb-4 mb-4 group-hover:border-acid transition-colors duration-500">
+                        <span class="font-mono text-[10px] text-gray-500 block mb-2">DATE: 2023-12-10 | TAG: PRIVACY</span>
+                        <h3 class="font-display text-2xl leading-snug glitch-hover">De-Googling: Hosting Nextcloud on Raspberry Pi</h3>
+                    </div>
+                    <p class="font-serif text-gray-400 text-lg leading-relaxed group-hover:text-white transition-colors">
+                        Membangun cloud pribadi yang aman di rumah. Solusi backup foto dan dokumen tanpa menyerahkan data ke raksasa teknologi.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signal (Contact) -->
+    <section id="signal" class="py-32 px-6 border-t border-white/10 relative overflow-hidden">
+        <div class="absolute inset-0 bg-acid/5 animate-pulse"></div>
+        <div class="container mx-auto text-center relative z-10">
+            <h2 class="font-mono text-xs text-acid mb-6">/// ESTABLISH_CONNECTION</h2>
+            <h3 class="font-display text-5xl md:text-8xl font-bold mb-10 mix-blend-lighten">
+                LET'S BUILD<br>THE FUTURE
+            </h3>
+            <a href="mailto:tuntun@example.com" class="inline-block px-12 py-4 border border-acid text-acid font-mono text-sm tracking-widest hover:bg-acid hover:text-black transition-all duration-300 transform hover:scale-105">
+                [ SEND_PACKET ]
+            </a>
+            <div class="mt-16 flex justify-center gap-8 font-mono text-xs text-gray-500">
+                <a href="#" class="hover:text-white transition">GITHUB</a>
+                <a href="#" class="hover:text-white transition">LINKEDIN</a>
+                <a href="#" class="hover:text-white transition">X / TWITTER</a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 border-t border-white/10">
-        <div class="container mx-auto px-6 text-center">
-            <h1 class="font-display text-[15vw] leading-none text-[#111] select-none hover:text-white transition-colors duration-1000">TUNTUN</h1>
-            <div class="flex justify-between items-center mt-8 font-mono text-xs text-gray-500 uppercase">
-                <span>(C) 2024</span>
-                <div class="flex gap-4">
-                    <a href="#" class="hover:text-acid hover:underline">Github</a>
-                    <a href="#" class="hover:text-acid hover:underline">Instagram</a>
-                </div>
-                <span>END_OF_LINE</span>
-            </div>
+    <footer class="py-8 border-t border-white/10 bg-[#020202]">
+        <div class="container mx-auto px-6 flex justify-between items-center font-mono text-[10px] text-gray-600">
+            <span>SYS_ID: THT_2024_V2</span>
+            <span>END_OF_TRANSMISSION</span>
         </div>
     </footer>
 
     <script>
-        // Custom Interaction Logic
-        document.addEventListener('DOMContentLoaded', () => {
-            // Mobile Menu
-            const menuBtn = document.getElementById('menu-btn');
-            const closeMenu = document.getElementById('close-menu');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileLinks = document.querySelectorAll('.mobile-link');
-
-            function toggleMenu() {
-                mobileMenu.classList.toggle('translate-y-[-100%]');
-            }
-
-            menuBtn.addEventListener('click', toggleMenu);
-            closeMenu.addEventListener('click', toggleMenu);
-            mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
-
-            // Scroll Reveal Animation
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
-
-            // Cursor Follow Effect for Blob (Subtle parallax)
-            document.addEventListener('mousemove', (e) => {
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
+        // Scramble Text Effect Logic
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/{}[]<>";
+        
+        document.querySelectorAll('.glitch-hover').forEach(element => {
+            element.addEventListener('mouseover', event => {
+                let iteration = 0;
+                const originalText = event.target.innerText;
                 
-                const blob1 = document.querySelector('.blob-1');
-                const blob2 = document.querySelector('.blob-2');
-
-                blob1.style.transform = `translate(${x * 30}px, ${y * 30}px)`;
-                blob2.style.transform = `translate(${-x * 30}px, ${-y * 30}px)`;
+                const interval = setInterval(() => {
+                    event.target.innerText = originalText
+                        .split("")
+                        .map((letter, index) => {
+                            if(index < iteration) {
+                                return originalText[index];
+                            }
+                            return letters[Math.floor(Math.random() * 26)];
+                        })
+                        .join("");
+                    
+                    if(iteration >= originalText.length){ 
+                        clearInterval(interval);
+                    }
+                    
+                    iteration += 1/3;
+                }, 30);
+                
+                element.addEventListener('mouseout', () => {
+                    clearInterval(interval);
+                    event.target.innerText = originalText;
+                }, {once: true});
             });
         });
+
+        // Terminal Typing Animation
+        const terminalOutput = document.getElementById('terminal-content');
+        const commands = [
+            "loading kernel modules...",
+            "mounting /dev/sda1 on /boot...",
+            "starting systemd-journald...",
+            "[ OK ] reached target graphical.target",
+            "initializing portfolio interface...",
+            "loading assets: [##########] 100%",
+            "fetching articles from /var/log/...",
+            "user: tuntun connected.",
+            "status: online",
+            "listening on port 8080..."
+        ];
+
+        let lineIndex = 0;
+
+        function typeLine() {
+            if (lineIndex < commands.length) {
+                const line = document.createElement('div');
+                line.className = "border-l-2 border-transparent pl-2";
+                line.innerText = `> ${commands[lineIndex]}`;
+                terminalOutput.appendChild(line);
+                
+                // Random scrolling glitch
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                
+                lineIndex++;
+                setTimeout(typeLine, Math.random() * 500 + 200);
+            } else {
+                // Loop simple blinking cursor effect after done
+                const cursor = document.createElement('div');
+                cursor.innerText = "> _";
+                cursor.className = "animate-pulse pl-2 text-acid";
+                terminalOutput.appendChild(cursor);
+            }
+        }
+        
+        // Start typing when visible
+        const terminalObserver = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting && lineIndex === 0) {
+                typeLine();
+            }
+        });
+        terminalObserver.observe(terminalOutput);
+
+
+        // Mobile Menu
+        const menuBtn = document.getElementById('menu-btn');
+        const closeMenu = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('translate-x-full');
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        closeMenu.addEventListener('click', toggleMenu);
+        mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
+
+        // Scroll Reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>
